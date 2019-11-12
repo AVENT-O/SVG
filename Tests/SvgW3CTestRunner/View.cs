@@ -12,6 +12,29 @@ using System.Diagnostics;
 
 namespace SvgW3CTestRunner
 {
+    public static class Extensions
+    {
+        public static Bitmap ToBitmap(this SkiaSharp.SKPicture picture, SkiaSharp.SKSizeI dimensions)
+        {
+            using (var image = SkiaSharp.SKImage.FromPicture(picture, dimensions))
+            {
+                return image.ToBitmap();
+            }
+        }
+
+        public static Bitmap ToBitmap(this SkiaSharp.SKImage skiaImage)
+        {
+            var bitmap = new Bitmap(skiaImage.Width, skiaImage.Height, PixelFormat.Format32bppPArgb);
+            var data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, bitmap.PixelFormat);
+            using (var pixmap = new SkiaSharp.SKPixmap(new SkiaSharp.SKImageInfo(data.Width, data.Height), data.Scan0, data.Stride))
+            {
+                skiaImage.ReadPixels(pixmap, 0, 0);
+            }
+            bitmap.UnlockBits(data);
+            return bitmap;
+        }
+    }
+
     public partial class View : Form
     {
         //DIRECTORY SEPARATOR: The value of this field is a slash ("/") on UNIX and on Mac OSX, and a backslash ("\") on the Windows operating systems.
@@ -90,13 +113,23 @@ namespace SvgW3CTestRunner
                 doc = SvgDocument.Open(_svgBasePath + fileName);
                 if (fileName.StartsWith("__"))
                 {
-                    picSvg.Image = doc.Draw();
+                    //picSvg.Image = doc.Draw();
+                    using (var svg = new Svg.Skia.SKSvg())
+                    {
+                        var skPicture = svg.FromSvgDocument(doc);
+                        picSvg.Image = skPicture.ToBitmap(new SkiaSharp.SKSizeI((int)skPicture.CullRect.Width, (int)skPicture.CullRect.Height));
+                    }
                 }
                 else
                 {
-                    var img = new Bitmap(480, 360);
-                    doc.Draw(img);
-                    picSvg.Image = img;
+                    //var img = new Bitmap(480, 360);
+                    //doc.Draw(img);
+                    //picSvg.Image = img;
+                    using (var svg = new Svg.Skia.SKSvg())
+                    {
+                        var skPicture = svg.FromSvgDocument(doc);
+                        picSvg.Image = skPicture.ToBitmap(new SkiaSharp.SKSizeI((int)skPicture.CullRect.Width, (int)skPicture.CullRect.Height));
+                    }
                 }
 
                 this.boxConsoleLog.AppendText("\n\nWC3 TEST " + fileName + "\n");

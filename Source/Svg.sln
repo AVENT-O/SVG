@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvgW3CTestRunner", "..\Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SVGViewer", "..\Samples\SVGViewer\SVGViewer.csproj", "{1B8F3C8A-CCAC-474E-B09D-522FBA93DCFD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Svg.Skia", "..\..\..\src\Svg.Skia\Svg.Skia.csproj", "{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,18 @@ Global
 		{1B8F3C8A-CCAC-474E-B09D-522FBA93DCFD}.Release|Mixed Platforms.Build.0 = Release|x86
 		{1B8F3C8A-CCAC-474E-B09D-522FBA93DCFD}.Release|x86.ActiveCfg = Release|x86
 		{1B8F3C8A-CCAC-474E-B09D-522FBA93DCFD}.Release|x86.Build.0 = Release|x86
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Debug|x86.Build.0 = Debug|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Release|x86.ActiveCfg = Release|Any CPU
+		{4CFC0549-E219-4A8B-A0B5-B6A968CCFCB0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
