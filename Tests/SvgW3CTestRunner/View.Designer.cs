@@ -146,7 +146,7 @@ namespace SvgW3CTestRunner
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(67, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "SVG Render";
+            this.label1.Text = "Svg.Skia Render";
             // 
             // picSvg
             // 
@@ -166,7 +166,7 @@ namespace SvgW3CTestRunner
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(80, 13);
             this.label3.TabIndex = 3;
-            this.label3.Text = "Save and Load";
+            this.label3.Text = "Svg Render";
             // 
             // tableLayoutPanel3
             // 
@@ -226,7 +226,7 @@ namespace SvgW3CTestRunner
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(69, 13);
             this.label4.TabIndex = 4;
-            this.label4.Text = "SVG vs PNG";
+            this.label4.Text = "Svg.Skia vs PNG";
             // 
             // bottomTabBox
             // 
