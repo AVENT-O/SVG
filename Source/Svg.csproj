@@ -28,7 +28,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>Fixed security issue, minor bug fixes (see Release Notes: http://svg-net.github.io/SVG/doc/ReleaseNotes.html).
+    <PackageReleaseNotes>Fixed a regression in loading embedded images (see Release Notes: http://svg-net.github.io/SVG/doc/ReleaseNotes.html).
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/svg-net/SVG</PackageProjectUrl>
     <PackageIconUrl>https://www.w3.org/Icons/SVG/svg-logo-v.png</PackageIconUrl>
@@ -95,11 +95,7 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' != 'net452'">
-    <DefineConstants>$(DefineConstants);USE_SOURCE_GENERATORS</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' != 'net452'">
+  <ItemGroup>
     <ProjectReference Include="..\Generators\Svg.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 

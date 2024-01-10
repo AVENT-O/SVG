@@ -3,6 +3,19 @@ The release versions are NuGet releases.
 
 ## Unreleased
 
+### Enhancements
+* made exceptions serializable to be able to cross AppDomain boundaries (see [#826](https://github.com/svg-net/SVG/pull/826))
+
+### Fixes
+* fixed XML namespace prefixes are also applied for nodes declaring them (see [PR #1106](https://github.com/svg-net/SVG/pull/1106))
+
+## [Version 3.4.6](https://www.nuget.org/packages/Svg/3.4.6)  (2023-11-16)
+
+### Fixes
+* fixed loading of embedded images (see [#1101](https://github.com/svg-net/SVG/issues/1101))
+
+## [Version 3.4.5](https://www.nuget.org/packages/Svg/3.4.5)  (2023-10-31)
+
 ### Changes
 * removed out of support framework versions .NET 5 (replaced with .NET 6) (see PR [#1045](https://github.com/svg-net/SVG/pull/1045))
 
