@@ -5,12 +5,21 @@ using System.IO;
 using System.Text;
 
 using NUnit.Framework;
+using System.Linq;
+
+using Svg.Tests.Common;
 
 namespace Svg.UnitTests
 {
     [TestFixture]
     public class PerformanceTest 
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            TestsUtils.EnsureTestsExists(ImageTestDataSource.SuiteTestsFolder).Wait();
+        }
+
         public static string AssemblyDirectory
         {
             get
@@ -31,9 +40,11 @@ namespace Svg.UnitTests
         [Test]
         public void LoadAllW3CSvg()
         {
-            var svgPath = Path.Combine(AssemblyDirectory, "..", "..", "..", "..", "W3CTestSuite", "svg");
-            var files = Directory.GetFiles(svgPath, "*.svg");
-            foreach (var file in files)
+            var w3cPath = Path.Combine(AssemblyDirectory, "..", "..", "..", "..", TestsUtils.W3CTests, "svg");
+            var issuesPath = Path.Combine(AssemblyDirectory, "..", "..", "..", "..", TestsUtils.IssuesTests, "svg");
+            var w3cFiles = Directory.GetFiles(w3cPath, "*.svg");
+            var issuesFiles = Directory.GetFiles(issuesPath, "*.svg");
+            foreach (var file in w3cFiles.Concat(issuesFiles))
             {
                 try
                 {

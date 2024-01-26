@@ -7,6 +7,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 
+using Svg.Tests.Common;
+
 namespace Svg.UnitTests
 {
     /// <summary>
@@ -14,6 +16,13 @@ namespace Svg.UnitTests
     [TestFixture]
     public class ImageComparisonTest
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            this.TestContext = TestContext.CurrentContext;
+            TestsUtils.EnsureTestsExists(ImageTestDataSource.SuiteTestsFolder).Wait();
+        }
+
         public TestContext TestContext { get; set; }
 
 #if NETSTANDARD || NETCOREAPP
@@ -53,14 +62,16 @@ namespace Svg.UnitTests
             {
                 basePath = Path.GetDirectoryName(basePath);
             }
-            basePath = Path.Combine(Path.Combine(basePath, "Tests"), "W3CTestSuite");
-            var svgBasePath = Path.Combine(basePath, "svg");
+            // var svgBasePath = Path.Combine(basePath, "svg");
             var baseName = testData.BaseName;
             bool testSaveLoad = !baseName.StartsWith("#");
             if (!testSaveLoad)
             {
                 baseName = baseName.Substring(1);
             }
+            var testsRoot = Path.Combine(basePath, "Tests");
+            basePath = TestsUtils.GetPath(testsRoot, baseName);
+            // basePath = Path.Combine(Path.Combine(basePath, "Tests"), "Issues");
             var svgPath = Path.Combine(Path.Combine(basePath, "svg"), baseName + ".svg");
             var pngPath = Path.Combine(Path.Combine(basePath, "png"), baseName + ".png");
             CompareSvgImageWithReferenceImpl(baseName, svgPath, pngPath, testSaveLoad);
@@ -111,18 +122,19 @@ namespace Svg.UnitTests
         /// of all considered W3C tests.
         /// Can be used to enhance the difference calculation.
         /// </summary>
-        // [TestFixture]
+        // [Test]
         public void RecordDiffForAllSvgImagesWithReference()
         {
-#if NETSTANDARD || NETCOREAPP
-            var basePath = Path.Combine(ImageTestDataSource.SuiteTestsFolder, "W3CTestSuite");
-#else
-            var basePath = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(TestContext.TestDirectory))); //TODO: Tthe get dir name was parsed from the testparams -> Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(TestContext.TestRunDirectory)));
-            basePath = Path.Combine(Path.Combine(basePath, "Tests"), "W3CTestSuite");
-#endif
-            string[] lines = File.ReadAllLines(@"..\..\..\..\Tests\Svg.UnitTests\all.csv");
+            var testsRoot = ImageTestDataSource.SuiteTestsFolder;
+            //string[] lines = File.ReadAllLines(@"..\..\..\..\Tests\Svg.UnitTests\all.csv");
+            string[] lines = File.ReadAllLines(Path.Combine(testsRoot, @"Svg.UnitTests\AllTests.csv"));
+            TestContext.Progress.WriteLine("RecordDiffForAllSvgImagesWithReference: Outputs");
             foreach (var baseName in lines)
             {
+                if (baseName.Equals("BaseName"))
+                    continue; // Skip the column header
+                var basePath = TestsUtils.GetPath(testsRoot, baseName);
+
                 var svgPath = Path.Combine(Path.Combine(basePath, "svg"), baseName + ".svg");
                 var pngPath = Path.Combine(Path.Combine(basePath, "png"), baseName + ".png");
                 if (File.Exists(pngPath) && File.Exists(svgPath))
@@ -133,7 +145,7 @@ namespace Svg.UnitTests
                     using (var svgImage = LoadSvgImage(svgDoc, useFixedSize))
                     {
                         var difference = svgImage.PercentageDifference(pngImage);
-                        Console.WriteLine(baseName + " " + (difference * 100.0).ToString());
+                        TestContext.Progress.WriteLine("    " + baseName + " " + (difference * 100.0).ToString());
                     }
                 }
             }
@@ -172,121 +184,6 @@ namespace Svg.UnitTests
     }
 
     /// <summary>
-    /// Taken from https://web.archive.org/web/20130111215043/http://www.switchonthecode.com/tutorials/csharp-tutorial-convert-a-color-image-to-grayscale
-    /// and slightly modified.
-    /// Image width and height, default threshold and handling of alpha values have been adapted.
-    /// </summary>
-    static class ExtensionMethods
-    {
-        private static readonly int ImageWidth = 64;
-        private static readonly int ImageHeight = 64;
-
-        public static float PercentageDifference(this Image img1, Image img2, byte threshold = 10)
-        {
-            byte[,] differences = img1.GetDifferences(img2);
-
-            int diffPixels = 0;
-
-            foreach (byte b in differences)
-            {
-                if (b > threshold) { diffPixels++; }
-            }
-
-            return diffPixels / (float)(differences.GetLength(0) * differences.GetLength(1));
-        }
-
-        public static Bitmap Resize(this Image originalImage, int newWidth, int newHeight)
-        {
-            if (originalImage.Width > originalImage.Height)
-                newWidth = originalImage.Width * newHeight / originalImage.Height;
-            else
-                newHeight = originalImage.Height * newWidth / originalImage.Width;
-
-            var smallVersion = new Bitmap(newWidth, newHeight);
-            using (var g = Graphics.FromImage(smallVersion))
-            {
-                g.SmoothingMode = SmoothingMode.HighQuality;
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.DrawImage(originalImage, 0, 0, smallVersion.Width, smallVersion.Height);
-            }
-
-            return smallVersion;
-        }
-
-        public static byte[,] GetGrayScaleValues(this Bitmap img)
-        {
-            byte[,] grayScale = new byte[img.Width, img.Height];
-
-            for (int y = 0; y < grayScale.GetLength(1); y++)
-            {
-                for (int x = 0; x < grayScale.GetLength(0); x++)
-                {
-                    var alpha = img.GetPixel(x, y).A;
-                    var gray = img.GetPixel(x, y).R;
-                    grayScale[x, y] = (byte)Math.Abs(gray * alpha / 255);
-                }
-            }
-            return grayScale;
-        }
-
-        // the colormatrix needed to grayscale an image
-        static readonly ColorMatrix ColorMatrix = new ColorMatrix(new float[][]
-        {
-            new float[] {.3f, .3f, .3f, 0, 0},
-            new float[] {.59f, .59f, .59f, 0, 0},
-            new float[] {.11f, .11f, .11f, 0, 0},
-            new float[] {0, 0, 0, 1, 0},
-            new float[] {0, 0, 0, 0, 1}
-        });
-
-        public static Bitmap GetGrayScaleVersion(this Bitmap original)
-        {
-            // create a blank bitmap the same size as original
-            // https://web.archive.org/web/20130111215043/http://www.switchonthecode.com/tutorials/csharp-tutorial-convert-a-color-image-to-grayscale
-            var newBitmap = new Bitmap(original.Width, original.Height);
-
-            // get a graphics object from the new image
-            using (var g = Graphics.FromImage(newBitmap))
-            // create some image attributes
-            using (var attributes = new ImageAttributes())
-            {
-                // set the color matrix attribute
-                attributes.SetColorMatrix(ColorMatrix);
-
-                // draw the original image on the new image
-                // using the grayscale color matrix
-                g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
-                    0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
-            }
-
-            return newBitmap;
-        }
-
-        public static byte[,] GetDifferences(this Image img1, Image img2)
-        {
-            using (var resizedThisOne = img1.Resize(ImageWidth, ImageHeight))
-            using (var thisOne = resizedThisOne.GetGrayScaleVersion())
-            using (var resizedTheOtherOne = img2.Resize(ImageWidth, ImageHeight))
-            using (var theOtherOne = resizedTheOtherOne.GetGrayScaleVersion())
-            {
-                byte[,] differences = new byte[thisOne.Width, thisOne.Height];
-                byte[,] firstGray = thisOne.GetGrayScaleValues();
-                byte[,] secondGray = theOtherOne.GetGrayScaleValues();
-
-                for (int y = 0; y < differences.GetLength(1); y++)
-                {
-                    for (int x = 0; x < differences.GetLength(0); x++)
-                    {
-                        differences[x, y] = (byte)Math.Abs(firstGray[x, y] - secondGray[x, y]);
-                    }
-                }
-                return differences;
-            }
-        }
-    }
-
-    /// <summary>
     /// Helper class to read the datasource for the image tests.
     /// The datasource will read the embedded resource with the Tests and will pass a TestData class with the data to test.
     /// </summary>
@@ -305,10 +202,15 @@ namespace Svg.UnitTests
         public static IEnumerable<TestData> PassingTests()
         {
             var basePath = SuiteTestsFolder;
-            var testSuite = Path.Combine(basePath, "W3CTestSuite");
+            var W3CPath = Path.Combine(basePath, TestsUtils.W3CTests);
+            var IssuesPath = Path.Combine(basePath, TestsUtils.IssuesTests);
             var rows = new ImageTestDataSource().LoadRowsFromResourceCsv().Skip(1); // Skip header row
             foreach (var row in rows)
+            {
+                var testSuite = row.StartsWith(TestsUtils.IssuesPrefix) ? IssuesPath : W3CPath;
+
                 yield return new TestData() { BasePath = testSuite, BaseName = row };
+            }
         }
 
         private const string ResourceIdentifier = "PassingTests.csv";

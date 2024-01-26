@@ -6,14 +6,21 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using ExCSS;
-using Fizzler;
 using Svg.Css;
+
+using Svg.Tests.Common;
 
 namespace Svg.UnitTests
 {
     [TestFixture]
     public class ExCssSelectorTests
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            TestsUtils.EnsureTestsExists(ImageTestDataSource.SuiteTestsFolder).Wait();
+        }
+
         [Test]
         [TestCase("struct-use-11-f")]
         [TestCase("struct-use-10-f")]
@@ -29,7 +36,7 @@ namespace Svg.UnitTests
         public void RunAllSelectorTests(string baseName, string folder)
         {
             var elementFactory = new SvgElementFactory();
-            var testSuite = Path.Combine(ImageTestDataSource.SuiteTestsFolder, "W3CTestSuite");
+            var testSuite = TestsUtils.GetPath(ImageTestDataSource.SuiteTestsFolder, baseName);
             string basePath = folder ?? Path.Combine(testSuite, "svg");
             var svgPath = Path.Combine(basePath, baseName + ".svg");
 
@@ -153,7 +160,7 @@ namespace Svg.UnitTests
         public void RunSelectorTests(string selector, string baseName)
         {
             var elementFactory = new SvgElementFactory();
-            var testSuite = Path.Combine(ImageTestDataSource.SuiteTestsFolder, "W3CTestSuite");
+            var testSuite = TestsUtils.GetPath(ImageTestDataSource.SuiteTestsFolder, baseName);
             string basePath = testSuite;
             var svgPath = Path.Combine(basePath, "svg", baseName + ".svg");
             var styles = new List<ISvgNode>();
@@ -256,7 +263,7 @@ namespace Svg.UnitTests
         {
             string baseName = "struct-use-11-f";
             var elementFactory = new SvgElementFactory();
-            var testSuite = Path.Combine(ImageTestDataSource.SuiteTestsFolder, "W3CTestSuite");
+            var testSuite = TestsUtils.GetPath(ImageTestDataSource.SuiteTestsFolder, baseName);
             string basePath = testSuite;
             var svgPath = Path.Combine(basePath, "svg", baseName + ".svg");
             var styles = new List<ISvgNode>();
@@ -284,7 +291,7 @@ namespace Svg.UnitTests
             try
             {
                 Debug.WriteLine("Fizzler:\r\n");
-                fizzlerElements = QuerySelectorFizzlerAll(rootNode, selector, elementFactory).OrderBy(f => f.ElementName).ToList();
+                fizzlerElements = CssQuery.QuerySelectorFizzlerAll(rootNode, selector, elementFactory).OrderBy(f => f.ElementName).ToList();
                 Debug.WriteLine(Environment.NewLine);
             }
             catch (Exception ex)
@@ -294,7 +301,7 @@ namespace Svg.UnitTests
             }
 
             Debug.WriteLine("ExCss:\r\n");
-            var exCssElements = QuerySelectorExCssAll(rootNode, selector, elementFactory).OrderBy(f => f.ElementName).ToList();
+            var exCssElements = CssQuery.QuerySelectorExCssAll(rootNode, selector, elementFactory).OrderBy(f => f.ElementName).ToList();
             Debug.WriteLine(Environment.NewLine);
 
             if (fizzler)
@@ -307,25 +314,15 @@ namespace Svg.UnitTests
                 Assert.Inconclusive("Fizzler can't handle this selector");
             }
         }
-
-        private IEnumerable<SvgElement> QuerySelectorExCssAll(NonSvgElement elem, string selector, SvgElementFactory elementFactory)
-        {
-            var stylesheetParser = new StylesheetParser(true, true);
-            var stylesheet = stylesheetParser.Parse(selector + " {color:black}");
-            var exCssSelector = stylesheet.StyleRules.First().Selector;
-            return elem.QuerySelectorAll(exCssSelector, elementFactory);
-        }
-
-        private IEnumerable<SvgElement> QuerySelectorFizzlerAll(NonSvgElement elem, string selector, SvgElementFactory elementFactory)
-        {
-            var generator = new SelectorGenerator<SvgElement>(new SvgElementOps(elementFactory));
-            Fizzler.Parser.Parse(selector, generator);
-            return generator.Selector(Enumerable.Repeat(elem, 1));
-        }
     }
 
     public class TestSvg
     {
+        static TestSvg()
+        {
+            TestsUtils.EnsureTestsExists(ImageTestDataSource.SuiteTestsFolder).Wait();
+        }
+
         private readonly string _baseName;
         private readonly string _folder;
 
@@ -346,7 +343,16 @@ namespace Svg.UnitTests
         public static IEnumerable<TestSvg> AllSvgs()
         {
             var basePath = ImageTestDataSource.SuiteTestsFolder;
-            var testSuite = Path.Combine(basePath, "W3CTestSuite", "svg");
+            var testSuite = Path.Combine(basePath, TestsUtils.W3CTests, "svg");
+            // Enumerate all Test Svgs
+            foreach(var baseName in Directory.EnumerateFiles(testSuite))
+            {
+                if (Path.GetExtension(baseName) == ".svg")
+                {
+                    yield return new TestSvg(Path.GetFileNameWithoutExtension(baseName), testSuite);
+                }
+            } 
+            testSuite = Path.Combine(basePath, TestsUtils.IssuesTests, "svg");
             // Enumerate all Test Svgs
             foreach(var baseName in Directory.EnumerateFiles(testSuite))
             {
@@ -360,7 +366,18 @@ namespace Svg.UnitTests
         public static IEnumerable<TestSvg> AllImageSvgs()
         {
             var basePath = ImageTestDataSource.SuiteTestsFolder;
-            var testSuite = Path.Combine(basePath, "W3CTestSuite", "images");
+            var testSuite = Path.Combine(basePath, TestsUtils.W3CTests, "images");
+            // Enumerate all Test Svgs
+            foreach(var baseName in Directory.EnumerateFiles(testSuite))
+            {
+                if (Path.GetExtension(baseName) == ".svg")
+                {
+                    yield return new TestSvg(
+                        Path.GetFileNameWithoutExtension(baseName),
+                        testSuite);
+                }
+            } 
+            testSuite = Path.Combine(basePath, TestsUtils.IssuesTests, "images");
             // Enumerate all Test Svgs
             foreach(var baseName in Directory.EnumerateFiles(testSuite))
             {
