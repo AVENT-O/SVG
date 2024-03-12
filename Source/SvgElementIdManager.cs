@@ -17,6 +17,12 @@ namespace Svg
         private SvgDocument _document;
         private Dictionary<string, SvgElement> _idValueMap;
 
+        public Dictionary<string, SvgElement> IdValueMap
+        {
+            get => _idValueMap;
+            set => _idValueMap = value;
+        }
+
         internal ExternalType ResolveExternalElements
         {
             get { return SvgDocument.ResolveExternalElements; }
