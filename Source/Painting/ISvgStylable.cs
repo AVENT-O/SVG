@@ -1,8 +1,4 @@
-#if !NO_SDC
-using System.Drawing.Drawing2D;
-#endif
-
-namespace Svg
+﻿namespace Svg
 {
     /// <summary>
     /// Defines the methods and properties required for an SVG element to be styled.
@@ -21,8 +17,5 @@ namespace Svg
         float StrokeMiterLimit { get; set; }
         SvgUnitCollection StrokeDashArray { get; set; }
         SvgUnit StrokeDashOffset { get; set; }
-#if !NO_SDC
-        GraphicsPath Path(ISvgRenderer renderer);
-#endif
     }
 }

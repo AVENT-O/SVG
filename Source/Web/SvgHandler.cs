@@ -4,9 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
-#if !NO_SDC
-using System.Drawing.Imaging;
-#endif
 using System.IO;
 using System.Text;
 using System.Threading;

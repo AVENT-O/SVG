@@ -125,38 +125,6 @@ namespace Svg
                         return SvgPaintServer.NotSet;
                 }
 
-#if !NO_SDC
-                switch (colour.ToLowerInvariant())
-                {
-                    case "activeborder": return SystemColors.ActiveBorder;
-                    case "activecaption": return SystemColors.ActiveCaption;
-                    case "appworkspace": return SystemColors.AppWorkspace;
-                    case "background": return SystemColors.Desktop;
-                    case "buttonface": return SystemColors.Control;
-                    case "buttonhighlight": return SystemColors.ControlLightLight;
-                    case "buttonshadow": return SystemColors.ControlDark;
-                    case "buttontext": return SystemColors.ControlText;
-                    case "captiontext": return SystemColors.ActiveCaptionText;
-                    case "graytext": return SystemColors.GrayText;
-                    case "highlight": return SystemColors.Highlight;
-                    case "highlighttext": return SystemColors.HighlightText;
-                    case "inactiveborder": return SystemColors.InactiveBorder;
-                    case "inactivecaption": return SystemColors.InactiveCaption;
-                    case "inactivecaptiontext": return SystemColors.InactiveCaptionText;
-                    case "infobackground": return SystemColors.Info;
-                    case "infotext": return SystemColors.InfoText;
-                    case "menu": return SystemColors.Menu;
-                    case "menutext": return SystemColors.MenuText;
-                    case "scrollbar": return SystemColors.ScrollBar;
-                    case "threeddarkshadow": return SystemColors.ControlDarkDark;
-                    case "threedface": return SystemColors.Control;
-                    case "threedhighlight": return SystemColors.ControlLight;
-                    case "threedlightshadow": return SystemColors.ControlLightLight;
-                    case "window": return SystemColors.Window;
-                    case "windowframe": return SystemColors.WindowFrame;
-                    case "windowtext": return SystemColors.WindowText;
-                }
-#endif
                 int number;
                 if (Int32.TryParse(colour,NumberStyles.Integer, CultureInfo.InvariantCulture, out number))
                 {
@@ -197,11 +165,6 @@ namespace Svg
         {
             if (destinationType == typeof(string))
             {
-#if !NO_SDC
-                var colorString = ColorTranslator.ToHtml((Color)value).Replace("LightGrey", "LightGray");
-                // color names are expected to be lower case in XML
-                return colorString.StartsWith("#", StringComparison.InvariantCulture) ? colorString : colorString.ToLowerInvariant();
-#endif
             }
 
             return ToHtml((Color)value);

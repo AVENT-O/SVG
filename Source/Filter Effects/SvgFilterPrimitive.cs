@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
-#if !NO_SDC
-using System.Drawing.Drawing2D;
-#endif
 
 namespace Svg.FilterEffects
 {
@@ -63,9 +60,5 @@ namespace Svg.FilterEffects
         {
             get { return (SvgFilter)this.Parent; }
         }
-
-#if !NO_SDC
-        public abstract void Process(ImageBuffer buffer);
-#endif
     }
 }

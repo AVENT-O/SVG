@@ -418,12 +418,6 @@ namespace Svg
         internal static T Create<T>(XmlReader reader, SvgElementFactory elementFactory, List<ISvgNode> styles)
             where T : SvgDocument, new()
         {
-#if !NO_SDC
-            if (!SkipGdiPlusCapabilityCheck)
-            {
-                EnsureSystemIsGdiPlusCapable(); // Validate whether the GDI+ can be loaded, this will yield an exception if not
-            }
-#endif
             var elementStack = new Stack<SvgElement>();
             bool elementEmpty;
             SvgElement element = null;
