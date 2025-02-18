@@ -11,11 +11,12 @@ namespace Svg;
 
 public partial class SvgDocumentExt : SvgDocument
 {
-    public Dictionary<string, SvgPath> SvgPathPitches { get; set; }
-    public Dictionary<string, SvgEllipse> SvgPathPhotoLoc { get; set; }
+    public Dictionary<string, SvgPath> SvgUnits { get; set; }
+    public Dictionary<string, SvgEllipse> SvgPhotoLocations { get; set; }
     public Dictionary<string, SvgRectangle> SvgRectZones { get; set; }
-    public Dictionary<string, SvgPath> SvgPathCamp { get; set; }
-
+    public Dictionary<string, SvgPath> SvgCampColor { get; set; }
+    public Dictionary<string, SvgPath> SvgSubunits { get; set; }
+    public Dictionary<string, SvgPath> SvgFacilities { get; set; }
 
     /// <summary>
     /// OpenExts the document at the specified path and loads the SVG contents.
@@ -153,24 +154,18 @@ public partial class SvgDocumentExt : SvgDocument
         }
     }
 
-
-
-
     private static T CreateExt<T>(XmlReader reader) where T : SvgDocumentExt, new()
     {
         var styles = new List<ISvgNode>();
         var elementFactory = new SvgElementFactory();
 
-
         var svgDocument = CreateExt<T>(reader, elementFactory, styles);
-
 
         if (styles.Any())
         {
             var cssTotal = string.Join(Environment.NewLine, styles.Select(s => s.Content).ToArray());
             var stylesheetParser = new StylesheetParser(true, true, tolerateInvalidValues: true);
             var stylesheet = stylesheetParser.Parse(cssTotal);
-
 
             foreach (var rule in stylesheet.StyleRules)
                 try
@@ -193,37 +188,41 @@ public partial class SvgDocumentExt : SvgDocument
         }
         svgDocument?.FlushStyles(true);
 
-
-        svgDocument.SvgPathPitches = new();
-        svgDocument.SvgPathPhotoLoc = new();
+        svgDocument.SvgUnits = new();
+        svgDocument.SvgPhotoLocations = new();
         svgDocument.SvgRectZones = new();
-        svgDocument.SvgPathCamp = new();
-
+        svgDocument.SvgCampColor = new();
+        svgDocument.SvgSubunits = new();
+        svgDocument.SvgFacilities = new();
 
         foreach (var svgElement in svgDocument.IdManager.IdValueMap)
         {
-            if (svgElement.Value is SvgPath && svgElement.Key.StartsWith("PT"))
+            if (svgElement.Key.Length < 3) continue;
+
+            switch(svgElement.Key.Substring(0, 2))
             {
-                svgDocument.SvgPathPitches.Add(svgElement.Key, svgElement.Value as SvgPath);
-            }
-            else if (svgElement.Value is SvgEllipse && svgElement.Key.StartsWith("PL"))
-            {
-                svgDocument.SvgPathPhotoLoc.Add(svgElement.Key, svgElement.Value as SvgEllipse);
-            }
-            else if (svgElement.Value is SvgRectangle && svgElement.Key.StartsWith("PV"))
-            {
-                svgDocument.SvgRectZones.Add(svgElement.Key, svgElement.Value as SvgRectangle);
-            }
-            else if (svgElement.Value is SvgPath && svgElement.Key.StartsWith("PC"))
-            {
-                svgDocument.SvgPathCamp.Add(svgElement.Key, svgElement.Value as SvgPath);
+                case "PT" when svgElement.Value is SvgPath:
+                    svgDocument.SvgUnits.Add(svgElement.Key, svgElement.Value as SvgPath);
+                    break;
+                case "PL" when svgElement.Value is SvgEllipse:
+                    svgDocument.SvgPhotoLocations.Add(svgElement.Key, svgElement.Value as SvgEllipse);
+                    break;
+                case "PV" when svgElement.Value is SvgRectangle:
+                    svgDocument.SvgRectZones.Add(svgElement.Key, svgElement.Value as SvgRectangle);
+                    break;
+                case "PC" when svgElement.Value is SvgPath:
+                    svgDocument.SvgCampColor.Add(svgElement.Key, svgElement.Value as SvgPath);
+                    break;
+                case "PS" when svgElement.Value is SvgPath:
+                    svgDocument.SvgSubunits.Add(svgElement.Key, svgElement.Value as SvgPath);
+                    break;
+                case "PF" when svgElement.Value is SvgPath:
+                    svgDocument.SvgFacilities.Add(svgElement.Key, svgElement.Value as SvgPath);
+                    break;
             }
         }
-
-
         return svgDocument;
     }
-
 
     /// <summary> OpenExt Svg Document without applying Stylesheets. </summary>
     /// <typeparam name="T">SvgDocumentExt to create</typeparam>
