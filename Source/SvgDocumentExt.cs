@@ -207,9 +207,15 @@ public partial class SvgDocumentExt : SvgDocument
                 case "PL" when svgElement.Value is SvgEllipse:
                     svgDocument.SvgPhotoLocations.Add(svgElement.Key, svgElement.Value as SvgEllipse);
                     break;
-                case "PV" when svgElement.Value is SvgRectangle:
-                    svgDocument.SvgRectZones.Add(svgElement.Key, svgElement.Value as SvgRectangle);
-                    break;
+                //case "PW" when svgElement.Value is SvgEllipse:
+                //    break;
+                //case "PE" when svgElement.Value is SvgEllipse:
+                //    break;
+                //case "PV" when svgElement.Value is SvgRectangle:
+                //    svgDocument.SvgRectZones.Add(svgElement.Key, svgElement.Value as SvgRectangle);
+                //    break;
+                //case "PG":
+                //    break;
                 case "PC" when svgElement.Value is SvgPath:
                     svgDocument.SvgCampColor.Add(svgElement.Key, svgElement.Value as SvgPath);
                     break;
