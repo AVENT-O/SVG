@@ -13,6 +13,8 @@ public partial class SvgDocumentExt : SvgDocument
 {
     public Dictionary<string, SvgPath> SvgUnits { get; set; }
     public Dictionary<string, SvgEllipse> SvgPhotoLocations { get; set; }
+    public Dictionary<string, SvgEllipse> SvgPhotoWater { get; set; }
+    public Dictionary<string, SvgEllipse> SvgPhotoElectricity { get; set; }
     public Dictionary<string, SvgRectangle> SvgRectZones { get; set; }
     public Dictionary<string, SvgPath> SvgCampColor { get; set; }
     public Dictionary<string, SvgPath> SvgSubunits { get; set; }
@@ -66,7 +68,7 @@ public partial class SvgDocumentExt : SvgDocument
         using (var stream = File.OpenRead(path))
         {
             var doc = OpenExt<T>(stream, entities);
-            doc.BaseUri = new Uri(System.IO.Path.GetFullPath(path));
+            doc.BaseUri = new Uri(Path.GetFullPath(path));
             return doc;
         }
     }
@@ -190,6 +192,8 @@ public partial class SvgDocumentExt : SvgDocument
 
         svgDocument.SvgUnits = new();
         svgDocument.SvgPhotoLocations = new();
+        svgDocument.SvgPhotoElectricity = new();
+        svgDocument.SvgPhotoWater = new();
         svgDocument.SvgRectZones = new();
         svgDocument.SvgCampColor = new();
         svgDocument.SvgSubunits = new();
@@ -207,15 +211,15 @@ public partial class SvgDocumentExt : SvgDocument
                 case "PL" when svgElement.Value is SvgEllipse:
                     svgDocument.SvgPhotoLocations.Add(svgElement.Key, svgElement.Value as SvgEllipse);
                     break;
-                //case "PW" when svgElement.Value is SvgEllipse:
-                //    break;
-                //case "PE" when svgElement.Value is SvgEllipse:
-                //    break;
-                //case "PV" when svgElement.Value is SvgRectangle:
-                //    svgDocument.SvgRectZones.Add(svgElement.Key, svgElement.Value as SvgRectangle);
-                //    break;
-                //case "PG":
-                //    break;
+                case "PW" when svgElement.Value is SvgEllipse:
+                    svgDocument.SvgPhotoWater.Add(svgElement.Key, svgElement.Value as SvgEllipse);
+                    break;
+                case "PE" when svgElement.Value is SvgEllipse:
+                    svgDocument.SvgPhotoElectricity.Add(svgElement.Key, svgElement.Value as SvgEllipse);
+                    break;
+                case "PV" when svgElement.Value is SvgRectangle:
+                    svgDocument.SvgRectZones.Add(svgElement.Key, svgElement.Value as SvgRectangle);
+                    break;
                 case "PC" when svgElement.Value is SvgPath:
                     svgDocument.SvgCampColor.Add(svgElement.Key, svgElement.Value as SvgPath);
                     break;
