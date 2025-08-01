@@ -15,6 +15,8 @@ public partial class SvgDocumentExt : SvgDocument
     public Dictionary<string, SvgEllipse> SvgPhotoLocations { get; set; }
     public Dictionary<string, SvgEllipse> SvgPhotoWater { get; set; }
     public Dictionary<string, SvgEllipse> SvgPhotoElectricity { get; set; }
+    public SvgPath SvgPhotoWaterIcon { get; set; }
+    public SvgPath SvgPhotoElectricityIcon { get; set; }
     public Dictionary<string, SvgRectangle> SvgRectZones { get; set; }
     public Dictionary<string, SvgPath> SvgCampColor { get; set; }
     public Dictionary<string, SvgPath> SvgSubunits { get; set; }
@@ -216,6 +218,11 @@ public partial class SvgDocumentExt : SvgDocument
                     break;
                 case "PE" when svgElement.Value is SvgEllipse:
                     svgDocument.SvgPhotoElectricity.Add(svgElement.Key, svgElement.Value as SvgEllipse);
+                    break;
+                case "PW" when svgElement.Value is SvgPath:
+                    svgDocument.SvgPhotoWaterIcon = svgElement.Value as SvgPath; break;
+                case "PE" when svgElement.Value is SvgPath:
+                    svgDocument.SvgPhotoElectricityIcon = svgElement.Value as SvgPath;
                     break;
                 case "PV" when svgElement.Value is SvgRectangle:
                     svgDocument.SvgRectZones.Add(svgElement.Key, svgElement.Value as SvgRectangle);
